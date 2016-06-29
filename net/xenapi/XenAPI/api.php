@@ -121,6 +121,7 @@ class RestAPI {
         'getthreads'               => 'public',
         'getuser'                  => 'authenticated', 
         'getusers'                 => 'public',
+        'getrankusers'             => 'api_key',
         'getuserupgrade'           => 'api_key',
         'getuserupgrades'          => 'api_key',
         'login'                    => 'public', 
@@ -277,7 +278,7 @@ class RestAPI {
             $this->order = 'desc';
         }
         // Set the limit.
-        $this->setLimit(100);
+        $this->setLimit(10000);
     }
 
     /**
@@ -2675,6 +2676,36 @@ class RestAPI {
                     $results = $this->xenAPI->getDatabase()->fetchAll("SELECT `user_id`, `username`" 
                         . ($this->hasRequest('order_by') ? ", " . $this->xenAPI->getDatabase()->quote($order_by_field) : '') 
                         . " FROM `xf_user`" . ($this->hasRequest('value') ? " WHERE `username` LIKE " . $this->xenAPI->getDatabase()->quote($string) : '') 
+                        . ($this->hasRequest('order_by') ? " ORDER BY `$order_by_field` " . $this->order : '') 
+                        . (($this->limit > 0) ? ' LIMIT ' . $this->xenAPI->getDatabase()->quote($this->limit) : ''));
+                }
+
+                // Send the response.
+                $this->sendResponse($results);
+            case 'getrankusers': 
+                /**
+                * Searches through the usernames depending on the input-group.
+                *
+                * EXAMPLE:
+                *   - api.php?action=getRankUsers&value=1
+                *   - api.php?action=getRankUsers&value=12
+                */
+
+                if ($this->hasAPIKey() && $this->hasRequest('value')) {
+					// Request has value.
+					if (!$this->getRequest('value')) {
+						// Throw error if the 'value' argument is set but empty.
+						$this->throwError(1, 'value');
+					}
+					
+                    // Check if the order by argument is set.
+                    $order_by_field = $this->checkOrderBy(array('user_id', 'message_count', 'conversations_unread', 'register_date', 'last_activity', 'trophy_points', 'alerts_unread', 'like_count'));
+                    
+                    // Perform the SQL query and grab all the usernames and user id's.
+                    // Perform the SQL query and grab all the usernames and user id's.
+                    $results = $this->xenAPI->getDatabase()->fetchAll("SELECT `user_id`, `username`" 
+                        . ($this->hasRequest('order_by') ? ", " . $this->xenAPI->getDatabase()->quote($order_by_field) : '') 
+                        . " FROM `xf_user`" . ($this->hasRequest('value') ? " WHERE `user_group_id` = " . $this->xenAPI->getDatabase()->quote($this->getRequest('value')) : '') 
                         . ($this->hasRequest('order_by') ? " ORDER BY `$order_by_field` " . $this->order : '') 
                         . (($this->limit > 0) ? ' LIMIT ' . $this->xenAPI->getDatabase()->quote($this->limit) : ''));
                 }
