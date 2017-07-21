@@ -1661,7 +1661,7 @@ class RestAPI {
                 }
 
                 // List of fields that are accepted to be edited.
-                $edit_fields = array('username', 'password', 'email', 'gender', 'custom_title', 'style_id', 'timezone', 'visible', 'dob_day', 'dob_month', 'dob_year', 'user_state', 'trophy_points');
+                $edit_fields = array('username', 'password', 'email', 'gender', 'custom_title', 'style_id', 'timezone', 'visible', 'dob_day', 'dob_month', 'dob_year', 'user_state', 'trophy_points', 'is_staff');
 
                 // List of fields that the request should ignore.
                 $ignore_fields = array('hash', 'action', 'user');
@@ -2963,7 +2963,7 @@ class RestAPI {
                 $required_parameters = array('username', 'password', 'email');
 
                 // Array of additional parameters.
-                $additional_parameters = array('timezone', 'gender', 'dob_day', 'dob_month', 'dob_year', 'ip_address');
+                $additional_parameters = array('timezone', 'gender', 'dob_day', 'dob_month', 'dob_year', 'ip_address', 'is_staff');
 
                 foreach ($required_parameters as $required_parameter) {
                     // Check if the required parameter is set and not empty.
